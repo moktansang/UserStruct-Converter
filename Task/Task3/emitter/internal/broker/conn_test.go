@@ -1,0 +1,54 @@
+/**********************************************************************************
+* Copyright (c) 2009-2019 Misakai Ltd.
+* This program is free software: you can redistribute it and/or modify it under the
+* terms of the GNU Affero General Public License as published by the  Free Software
+* Foundation, either version 3 of the License, or(at your option) any later version.
+*
+* This program is distributed  in the hope that it  will be useful, but WITHOUT ANY
+* WARRANTY;  without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+* PARTICULAR PURPOSE.  See the GNU Affero General Public License  for  more details.
+*
+* You should have  received a copy  of the  GNU Affero General Public License along
+* with this program. If not, see<http://www.gnu.org/licenses/>.
+************************************************************************************/
+
+package broker
+
+import (
+	"io/ioutil"
+	"testing"
+
+	"github.com/emitter-io/emitter/internal/errors"
+	"github.com/emitter-io/emitter/internal/message"
+	netmock "github.com/emitter-io/emitter/internal/network/mock"
+	"github.com/emitter-io/emitter/internal/security/license"
+	"github.com/emitter-io/stats"
+	"github.com/stretchr/testify/assert"
+)
+
+func newTestConn() (pipe *netmock.Conn, conn *Conn) {
+	license, _ := license.Parse(testLicense)
+	s := &Service{
+		subscriptions: message.NewTrie(),
+		License:       license,
+		measurer:      stats.NewNoop(),
+	}
+
+	pipe = netmock.NewConn()
+	conn = s.newConn(pipe.Client, 0)
+	return
+}
+
+func TestNotifyError(t *testing.T) {
+	pipe, conn := newTestConn()
+	assert.NotNil(t, pipe)
+
+	go func() {
+		conn.notifyError(errors.ErrUnauthorized, 1)
+		conn.Close()
+	}()
+
+	b, err := ioutil.ReadAll(pipe.Server)
+	assert.Contains(t, string(b), errors.ErrUnauthorized.Message)
+	assert.NoError(t, err)
+}
