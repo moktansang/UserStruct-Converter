@@ -1,0 +1,2 @@
+1. This cli tool requires two non-flag arguments. First is the github repository owner name and second is the repository name. Make sure that the repository is public.
+2.  Use `./Task2 spf13 cobra` or `go run main.go spf13 cobra` to print the last commit of the repository in terminal.
