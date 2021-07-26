@@ -1,0 +1,4 @@
+1. Before testing the tool make sure that a database is running on localhost:5432. Database should have a db with name "temp". If any configuration needs to be changed related to db connection then refer to line 13 and 14 in main.go and update it as required.
+2. Once the database is ready to connect use the binary to test the cli or go run command can also be used. This cli tool requires one non-flag argument to create or drop the table.
+3.  Use `./Task2 create` or `go run main.go create` to create a table with User struct. Check the database and verify that table is created. A log message "creating table" should be printed if there are no errors.
+4.  Use `./Task2 drop` or `go run main.go drop` to drop the table for cleanup or testing again. Check the database and verify that table is dropped. A log message "dropping table" should be printed if there are no errors.
